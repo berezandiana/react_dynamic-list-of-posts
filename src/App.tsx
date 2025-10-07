@@ -20,13 +20,14 @@ export const App = () => {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [usersError, setUsersError] = useState(false);
+  const [postsError, setPostsError] = useState(false);
 
   useEffect(() => {
     client
       .get<User[]>('/users')
       .then(setUsers)
-      .catch(() => setError(true));
+      .catch(() => setUsersError(true));
   }, []);
 
   useEffect(() => {
@@ -34,12 +35,12 @@ export const App = () => {
 
     if (selectedUserId) {
       setIsLoading(true);
-      setError(false);
+      setPostsError(false);
 
       client
         .get<Post[]>(`/posts?userId=${selectedUserId}`)
         .then(setPosts)
-        .catch(() => setError(true))
+        .catch(() => setPostsError(true))
         .finally(() => setIsLoading(false));
     } else {
       setPosts([]);
@@ -54,11 +55,20 @@ export const App = () => {
           <div className="tile is-parent">
             <div className="tile is-child box is-success">
               <div className="block">
-                <UserSelector
-                  users={users}
-                  selectedUserId={selectedUserId}
-                  onSelectUser={setSelectedUserId}
-                />
+                {usersError ? (
+                  <div
+                    className="notification is-danger"
+                    data-cy="UsersLoadingError"
+                  >
+                    Failed to load users
+                  </div>
+                ) : (
+                  <UserSelector
+                    users={users}
+                    selectedUserId={selectedUserId}
+                    onSelectUser={setSelectedUserId}
+                  />
+                )}
               </div>
 
               <div className="block" data-cy="MainContent">
@@ -68,7 +78,7 @@ export const App = () => {
 
                 {isLoading && <Loader />}
 
-                {error && (
+                {postsError && (
                   <div
                     className="notification is-danger"
                     data-cy="PostsLoadingError"
@@ -78,7 +88,7 @@ export const App = () => {
                 )}
 
                 {!isLoading &&
-                  !error &&
+                  !postsError &&
                   selectedUserId &&
                   posts.length === 0 && (
                     <div
@@ -89,7 +99,7 @@ export const App = () => {
                     </div>
                   )}
 
-                {!isLoading && !error && posts.length > 0 && (
+                {!isLoading && !postsError && posts.length > 0 && (
                   <PostsList
                     posts={posts}
                     selectedPostId={selectedPostId}
@@ -111,7 +121,7 @@ export const App = () => {
             )}
           >
             <div className="tile is-child box is-success ">
-              {selectedPostId && (
+              {selectedPostId !== null && (
                 <PostDetails
                   post={posts.find(post => post.id === selectedPostId)!}
                 />
