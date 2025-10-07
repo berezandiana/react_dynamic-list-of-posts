@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { User } from '../types/User';
 
 interface Props {
@@ -16,26 +16,13 @@ export const UserSelector: React.FC<Props> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const toggleDropdown = () => setIsOpen(prev => !prev);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
-
   return (
     <div
       ref={dropdownRef}
       data-cy="UserSelector"
       className={`dropdown ${isOpen ? 'is-active' : ''}`}
+      tabIndex={0}
+      onBlur={() => setIsOpen(false)}
     >
       <div className="dropdown-trigger">
         <button
@@ -43,6 +30,7 @@ export const UserSelector: React.FC<Props> = ({
           className="button"
           aria-haspopup="true"
           aria-controls="dropdown-menu"
+          aria-expanded={isOpen}
           onClick={toggleDropdown}
         >
           <span>

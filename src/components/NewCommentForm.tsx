@@ -187,7 +187,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onAddComment }) => {
 
         {errors.body && (
           <p className="help is-danger" data-cy="ErrorMessage">
-            Enter some text
+            {errors.body}
           </p>
         )}
       </div>

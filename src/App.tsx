@@ -44,7 +44,6 @@ export const App = () => {
         .finally(() => setIsLoading(false));
     } else {
       setPosts([]);
-      setSelectedPostId(null);
     }
   }, [selectedUserId]);
 
@@ -117,7 +116,7 @@ export const App = () => {
               'is-parent',
               'is-8-desktop',
               'Sidebar',
-              { 'Sidebar--open': selectedPostId },
+              { 'Sidebar--open': selectedPostId !== null },
             )}
           >
             <div className="tile is-child box is-success ">
